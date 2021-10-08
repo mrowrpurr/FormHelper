@@ -10,12 +10,14 @@ function ShowUI()
     menu.AddEntryItem("Hex to Form")
     menu.AddEntryItem("Hex to Mod Name")
     menu.AddEntryItem("Decimal to Hex")
+    menu.AddEntryItem("Char to Decimal")
     menu.OpenMenu()
 
     int hexToDecimal = 0
     int hexToForm = 1
     int hexToModName = 2
     int decimalToHex = 3
+    int charToDecimal = 4
     int selected = menu.GetResultInt()
     if selected == hexToDecimal
         HexToDecimalUI()
@@ -25,6 +27,8 @@ function ShowUI()
         HexToModNameUI()
     elseIf selected == decimalToHex
         DecimalToHexUI()
+    elseIf selected == charToDecimal
+        CharToDecimalUI()
     endIf
 endFunction
 
@@ -42,6 +46,10 @@ endFunction
 
 function HexToModNameUI()
     Debug.MessageBox(FormIds.GetModNameFromHex(GetUserText()))
+endFunction
+
+function CharToDecimalUI()
+    Debug.MessageBox(FormIds.CharToValue(GetUserText()))
 endFunction
 
 string function GetUserText()

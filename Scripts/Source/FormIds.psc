@@ -122,85 +122,45 @@ endFunction
 string function GetModHexPrefixFromForm(Form aForm) global
 endFunction
 
-; Returns the ASCII character for the provided decimal value.
-; Only supports 48-57 ("0"-"9") and 65-70 ("A"-"F")
-string function ValueToChar(int value) global
-    if value == 48
-        return "0"
-    elseIf value == 49
-        return "1"
-    elseIf value == 50
-        return "2"
-    elseIf value == 51
-        return "3"
-    elseIf value == 52
-        return "4"
-    elseIf value == 53
-        return "5"
-    elseIf value == 54
-        return "6"
-    elseIf value == 55
-        return "7"
-    elseIf value == 56
-        return "8"
-    elseIf value == 57
-        return "9"
-    elseIf value == 65
-        return "A"
-    elseIf value == 66
-        return "B"
-    elseIf value == 67
-        return "C"
-    elseIf value == 68
-        return "D"
-    elseIf value == 69
-        return "E"
-    elseIf value == 70
-        return "F"
-    else
-        return ""
-    endIf
-endFunction
-
-; Returns the ASCII decimal value for the provided character
-; Only supports "0"-"9" (48-57) and "A"-"F" (65-70)
-int function CharToValue(string char) global
-    if char == "0"
-        return 48
-    elseIf char == "1"
-        return 49
-    elseIf char == "2"
-        return 50
-    elseIf char == "3"
-        return 51
-    elseIf char == "4"
-        return 52
-    elseIf char == "5"
-        return 53
-    elseIf char == "6"
-        return 54
-    elseIf char == "7"
-        return 55
-    elseIf char == "8"
-        return 56
-    elseIf char == "9"
-        return 57
-    elseIf char == "A"
-        return 65
-    elseIf char == "B"
-        return 66
-    elseIf char == "C"
-        return 67
-    elseIf char == "D"
-        return 68
-    elseIf char == "E"
-        return 69
-    elseIf char == "F"
-        return 70
-    else
-        return -1
-    endIf
-endFunction
+; ; Returns the ASCII character for the provided decimal value.
+; ; Only supports 48-57 ("0"-"9") and 65-70 ("A"-"F")
+; string function ValueToChar(int value) global
+;     if value == 48
+;         return "0"
+;     elseIf value == 49
+;         return "1"
+;     elseIf value == 50
+;         return "2"
+;     elseIf value == 51
+;         return "3"
+;     elseIf value == 52
+;         return "4"
+;     elseIf value == 53
+;         return "5"
+;     elseIf value == 54
+;         return "6"
+;     elseIf value == 55
+;         return "7"
+;     elseIf value == 56
+;         return "8"
+;     elseIf value == 57
+;         return "9"
+;     elseIf value == 65
+;         return "A"
+;     elseIf value == 66
+;         return "B"
+;     elseIf value == 67
+;         return "C"
+;     elseIf value == 68
+;         return "D"
+;     elseIf value == 69
+;         return "E"
+;     elseIf value == 70
+;         return "F"
+;     else
+;         return ""
+;     endIf
+; endFunction
 
 ; Returns the provided hexadecimal string as a decimal integer value
 int function HexToDecimal(string hex) global
@@ -212,7 +172,7 @@ int function HexToDecimal(string hex) global
 
     while index >= 0
         string character = StringUtil.Substring(hex, index, 1)
-        int characterValue = CharToValue(character)
+        int characterValue = StringUtil.AsOrd(character)
         if characterValue == -1
             Debug.Trace("[FormIds] HexToDecimal() Invalid hex string provided: " + hex)
             return -1
@@ -230,8 +190,6 @@ int function HexToDecimal(string hex) global
     return decimal
 endFunction
 
-; TODO make *SURE* this returns an 8-length string!!!!!
-;
 ; Returns the provided decimal integer value as a hexadecimal string
 string function DecimalToHex(int decimal, int minHexStringLength = 8) global
     string hex = ""
@@ -264,7 +222,7 @@ string function DecimalToHex(int decimal, int minHexStringLength = 8) global
 
     i -= 1
     while i > 0
-        hex += ValueToChar(hexValues[i])
+        hex += StringUtil.AsChar(hexValues[i])
         i -= 1
     endWhile
 
