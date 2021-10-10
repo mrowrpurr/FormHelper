@@ -1,7 +1,7 @@
-scriptName FormIds_UI extends Quest  
+scriptName FormHelper_UI extends Quest  
 
-FormIds_UI function GetInstance() global
-    return Game.GetFormFromFile(0x800, "FormIds_UI.esp") as FormIds_UI
+FormHelper_UI function GetInstance() global
+    return Game.GetFormFromFile(0x800, "FormHelper_UI.esp") as FormHelper_UI
 endFunction
 
 function ShowUI()
@@ -10,14 +10,14 @@ function ShowUI()
     menu.AddEntryItem("Hex to Form")
     menu.AddEntryItem("Hex to Mod Name")
     menu.AddEntryItem("Decimal to Hex")
-    menu.AddEntryItem("Char to Decimal")
+    menu.AddEntryItem("Form to Hex")
     menu.OpenMenu()
 
     int hexToDecimal = 0
     int hexToForm = 1
     int hexToModName = 2
     int decimalToHex = 3
-    int charToDecimal = 4
+    int formToHex = 4
     int selected = menu.GetResultInt()
     if selected == hexToDecimal
         HexToDecimalUI()
@@ -27,29 +27,32 @@ function ShowUI()
         HexToModNameUI()
     elseIf selected == decimalToHex
         DecimalToHexUI()
-    elseIf selected == charToDecimal
-        CharToDecimalUI()
+    elseIf selected == formToHex
+        FormToHexUI()
     endIf
 endFunction
 
 function HexToDecimalUI()
-    Debug.MessageBox(FormIds.HexToDecimal(GetUserText()))
+    Debug.MessageBox(FormHelper.HexToDecimal(GetUserText()))
 endFunction
 
 function HexToFormUI()
-    Debug.MessageBox(FormIds.HexToForm(GetUserText()))
+    Debug.MessageBox(FormHelper.HexToForm(GetUserText()))
 endFunction
 
 function DecimalToHexUI()
-    Debug.MessageBox(FormIds.DecimalToHex(GetUserText() as int))
+    Debug.MessageBox(FormHelper.DecimalToHex(GetUserText() as int))
 endFunction
 
 function HexToModNameUI()
-    Debug.MessageBox(FormIds.GetModNameFromHex(GetUserText()))
+    Debug.MessageBox(FormHelper.HexToModName(GetUserText()))
 endFunction
 
-function CharToDecimalUI()
-    Debug.MessageBox(FormIds.CharToValue(GetUserText()))
+function FormToHexUI()
+    ; Get a form
+    Form aForm = FormHelper.HexToForm(GetUserText())
+    Debug.MessageBox(aForm + " " + aForm.GetName())
+    Debug.MessageBox(FormHelper.FormToHex(aForm))
 endFunction
 
 string function GetUserText()
