@@ -30,13 +30,18 @@ endFunction
 
 ; Returns the provided decimal integer value as a hexadecimal string.
 ;
+; Intended to be called with Skyrim Form ID values.
+;
 ; By default, the string will be at least 8 characters long by adding
 ; front-leading padding of zero `"0"` values (_to match Skyrim standard hex values_).
-string function DecimalToHex(int decimal, int minHexStringLength = 8) global
+;
+; To use this for generic Decimal to Hex conversion, specify `isFormID = false`
+string function DecimalToHex(int decimal, int minHexStringLength = 8, bool isFormID = true) global
     int originalDecimal = decimal
 
     bool isLight = false
-    if decimal < 0
+
+    if isFormID && decimal < 0
         isLight = true
         decimal = Math.LogicalAnd(decimal, 0xFFF) ; ESL Form ID
     endIf
@@ -75,6 +80,10 @@ string function DecimalToHex(int decimal, int minHexStringLength = 8) global
         i -= 1
     endWhile
 
+    if isLight && minHexStringLength == 8
+        minHexStringLength = 3 ; First 5 characters will be added below: FE xyz
+    endIf
+
     int zeroPaddingPrefixCount = minHexStringLength - StringUtil.GetLength(hex)
     if zeroPaddingPrefixCount > 0
         i = 0
@@ -85,23 +94,20 @@ string function DecimalToHex(int decimal, int minHexStringLength = 8) global
     endIf
 
     if isLight
-        ; string modIndexText = (Math.LogicalAnd(decimal, 0x0F)) + 1
-        ; hex = modIndexText + StringUtil.Substring(hex, 3)
-
-        string modIndexText = IntToHex(originalDecimal - decimal)
-
+        int modIndex = Math.RightShift(Math.LogicalAnd(originalDecimal, 16773120), 12) ; (x00FF000 & formID) >> 12
+        string modIndexText = DecimalToHex(modIndex, isFormID = false, minHexStringLength = 1)
+        hex = modIndexText + hex
         int modIndexTextLength = StringUtil.GetLength(modIndexText)
-        
         int zerosToAdd = 3 - modIndexTextLength
         i = 0
         while i < zerosToAdd
             hex = "0" + hex
             i += 1
         endWhile
-        return "FE" + hex
-    else
-        return hex
+        hex = "FE" + hex
     endIf
+
+    return hex
 endFunction
 
 ; Alias for `HexToDecimal()`
@@ -115,8 +121,8 @@ int function FormToInt(Form aForm) global
 endFunction
 
 ; Alias for `DecimalToHex()`
-string function IntToHex(int decimal) global
-    return DecimalToHex(decimal)
+string function IntToHex(int decimal, int minHexStringLength = 8, bool isFormID = true) global
+    return DecimalToHex(decimal, minHexStringLength, isFormID)
 endFunction
 
 ; ...

@@ -51,7 +51,7 @@ endFunction
 function FormToHexUI()
     ; Get a form
     Form aForm = FormHelper.HexToForm(GetUserText())
-    Debug.MessageBox(aForm + " " + aForm.GetName())
+    Debug.MessageBox(aForm + " " + aForm.GetName() + " " + aForm.GetFormID())
     Debug.MessageBox(FormHelper.FormToHex(aForm))
 endFunction
 
