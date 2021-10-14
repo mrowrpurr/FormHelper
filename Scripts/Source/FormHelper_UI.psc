@@ -51,6 +51,8 @@ function ShowUI()
     elseIf selected == formIDToHex
 
     elseIf selected == formToHex
+        Form aForm = FormHelper.HexToForm(text)
+        Debug.MessageBox(aForm + " " + aForm.GetName() + " equals " + FormHelper.FormToHex(aForm))
 
     elseIf selected == hexToForm
         Form aForm = FormHelper.HexToForm(text)

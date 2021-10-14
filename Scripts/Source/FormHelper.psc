@@ -71,10 +71,10 @@ string function FormIdToHex(int decimal) global
     if decimal < 0
         ; Light mods have negative Form IDs
         isLight = true
-        ; Get the main Form ID from this light mod's negative Form ID (without mod index)
-        decimal = Math.LogicalAnd(decimal, 0xFFF) 
         ; Get just the mod index from this light mod's negative Form ID
         lightModIndex = Math.RightShift(Math.LogicalAnd(decimal, 16773120), 12) ; (x00FF000 & formID) >> 12
+        ; Get the main Form ID from this light mod's negative Form ID (without mod index)
+        decimal = Math.LogicalAnd(decimal, 0xFFF) 
     endIf
 
     string hex = IntToHex(decimal)
