@@ -147,21 +147,61 @@ string function HexToModName(string hex) global
     endIf
 endFunction
 
-; doc
+; Returns the mod name which the provided Form comes from.
 string function FormToModName(Form aForm) global
-
+    return HexToModName(FormToHex(aForm))
 endFunction
 
-; doc
+; Returns true if the provided .esm/.esp is a light plugun.
+; Provide the full mod name, e.g. "MyMod.esp"
 bool function IsLightMod(string modPlugin) global
+    return Game.GetLightModByName(modPlugin) != 65535
 endFunction
 
-; doc
+; Returns true of the provided string hex Form ID comes from a light mod.
 bool function IsLightModHex(string hex) global
+    return StringUtil.Find(hex, "FE") == 0
 endFunction
 
-; doc
+; Returns true if the provided Form comes from a light mod.
 bool function IsLightModForm(Form aForm) global
+    return aForm.GetFormID() < 0
+endFunction
+
+; Returns the mod's index, extracted from the provided Form ID hex.
+int function HexToModIndex(string hex) global
+    int len = StringUtil.GetLength(hex)
+    if len == 8
+        if StringUtil.Find(hex, "FE") == 0
+            return HexToInt(StringUtil.Substring(hex, 2, 3))
+        else
+            return HexToInt(StringUtil.Substring(hex, 0, 2))
+        endIf
+    else
+        return 0
+    endIf
+endFunction
+
+; Returns a hex string representation of the mod's index,
+; extracted from the provided Form ID hex.
+string function HexToModIndexHex(string hex) global
+    int len = StringUtil.GetLength(hex)
+    if len == 8
+        if StringUtil.Find(hex, "FE") == 0
+            return StringUtil.Substring(hex, 2, 3)
+        else
+            return StringUtil.Substring(hex, 0, 2)
+        endIf
+    else
+        return "00"
+    endIf
+endFunction
+
+; Returns the Mod Index for the provided Form.
+; Can be used to call `Game.GetModName()` or `Game.GetLightModName()` etc.
+; You can use `IsLightModForm()` to see if the mod index is for a light mod.
+int function FormToModIndex(Form aForm) global
+    return HexToInt(FormToModIndexHex(aForm))
 endFunction
 
 ; Returns the Mod Index for the provided Form as a hexadecimal string.
@@ -171,6 +211,11 @@ endFunction
 ;
 ; To use this with `Game.GetModName()` or `Game.GetLightModName()`
 ; convert the return value to a decimal via `HexToInt()`
-string function GetModIndexTextFromForm(Form aForm) global
-
+string function FormToModIndexHex(Form aForm) global
+    string hex = FormToHex(aForm)
+    if StringUtil.Find(hex, "FE") == 0
+        return StringUtil.Substring(hex, 2, 3)
+    else
+        return StringUtil.Substring(hex, 0, 2)
+    endIf
 endFunction

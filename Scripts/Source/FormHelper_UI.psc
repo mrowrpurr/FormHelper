@@ -6,53 +6,84 @@ endFunction
 
 function ShowUI()
     UIListMenu menu = UIExtensions.GetMenu("UIListMenu") as UIListMenu
-    menu.AddEntryItem("Hex to Decimal")
+    menu.AddEntryItem("Hex to Int")
+    menu.AddEntryItem("Int to Hex")
+    menu.AddEntryItem("Form ID to Hex")
+    menu.AddEntryItem("Form to Hex")
     menu.AddEntryItem("Hex to Form")
     menu.AddEntryItem("Hex to Mod Name")
-    menu.AddEntryItem("Decimal to Hex")
-    menu.AddEntryItem("Form to Hex")
-    menu.OpenMenu()
+    menu.AddEntryItem("Form to Mod Name")
+    menu.AddEntryItem("IsLightMod")
+    menu.AddEntryItem("IsLightModHex")
+    menu.AddEntryItem("IsLightModForm")
+    menu.AddEntryItem("Hex To Mod Index")
+    menu.AddEntryItem("Hex To Mod Index Hex")
+    menu.AddEntryItem("Form To Mod Index")
+    menu.AddEntryItem("Form to Mod Index Hex")
 
-    int hexToDecimal = 0
-    int hexToForm = 1
-    int hexToModName = 2
-    int decimalToHex = 3
-    int formToHex = 4
+    menu.OpenMenu()
+    
+    int hexToInt = 0
+    int intToHex = 1
+    int formIDToHex = 2
+    int formToHex = 3
+    int hexToForm = 4
+    int hexToModName = 5
+    int formToModName = 6
+    int isLightMod = 7
+    int isLightModHex = 8
+    int isLightModForm = 9
+    int hexToModIndex = 10
+    int hexToModIndexHex = 11
+    int formToModIndex = 12
+    int formToModIndexHex = 13
+
     int selected = menu.GetResultInt()
-    if selected == hexToDecimal
-        HexToDecimalUI()
-    elseIf selected == hexToForm
-        HexToFormUI()
-    elseIf selected == hexToModName
-        HexToModNameUI()
-    elseIf selected == decimalToHex
-        DecimalToHexUI()
+
+    string text = GetUserText()
+
+    if selected == hexToInt
+        Debug.MessageBox(text + " equals " + FormHelper.HexToInt(text))
+
+    elseIf selected == intToHex
+        Debug.MessageBox(text + " equals " + FormHelper.IntToHex(text as int))
+
+    elseIf selected == formIDToHex
+
     elseIf selected == formToHex
-        FormToHexUI()
+
+    elseIf selected == hexToForm
+        Form aForm = FormHelper.HexToForm(text)
+        Debug.MessageBox(text + " equals " + aForm + " " + aForm.GetName())
+
+    elseIf selected == hexToModName
+        Debug.MessageBox(text + " comes from mod " + FormHelper.HexToModName(text))
+
+    elseIf selected == formToModName
+        Form aForm = FormHelper.HexToForm(text)
+        Debug.MessageBox(aForm + " " + aForm.GetName() + " comes from mod " + FormHelper.FormToModName(aForm))
+
+    elseIf selected == isLightMod
+        Debug.MessageBox(text + " is a light mod? " + FormHelper.IsLightMod(text))
+
+    elseIf selected == isLightModHex
+
+
+    elseIf selected == isLightModForm
+
+    elseIf selected == hexToModIndex
+
+    elseIf selected == hexToModIndexHex
+
+    elseIf selected == formToModIndex
+
+    elseIf selected == formToModIndexHex
+
     endIf
 endFunction
 
-function HexToDecimalUI()
-    Debug.MessageBox(FormHelper.HexToDecimal(GetUserText()))
-endFunction
-
-function HexToFormUI()
-    Debug.MessageBox(FormHelper.HexToForm(GetUserText()))
-endFunction
-
-function DecimalToHexUI()
-    Debug.MessageBox(FormHelper.DecimalToHex(GetUserText() as int))
-endFunction
-
-function HexToModNameUI()
-    Debug.MessageBox(FormHelper.HexToModName(GetUserText()))
-endFunction
-
-function FormToHexUI()
-    ; Get a form
-    Form aForm = FormHelper.HexToForm(GetUserText())
-    Debug.MessageBox(aForm + " " + aForm.GetName() + " " + aForm.GetFormID())
-    Debug.MessageBox(FormHelper.FormToHex(aForm))
+Form function GetForm()
+    return FormHelper.HexToForm(GetUserText())
 endFunction
 
 string function GetUserText()
