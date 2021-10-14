@@ -49,6 +49,8 @@ function ShowUI()
         Debug.MessageBox(text + " equals " + FormHelper.IntToHex(text as int))
 
     elseIf selected == formIDToHex
+        Form aForm = FormHelper.HexToForm(text)
+        Debug.MessageBox(aForm + " " + aForm.GetName() + " equals " + FormHelper.FormIdToHex(aForm.GetFormID()))
 
     elseIf selected == formToHex
         Form aForm = FormHelper.HexToForm(text)
@@ -69,17 +71,25 @@ function ShowUI()
         Debug.MessageBox(text + " is a light mod? " + FormHelper.IsLightMod(text))
 
     elseIf selected == isLightModHex
-
+        Debug.MessageBox(text + " is light mod hex? " + FormHelper.IsLightModHex(text))
 
     elseIf selected == isLightModForm
+        Form aForm = FormHelper.HexToForm(text)
+        Debug.MessageBox(aForm + " " + aForm.GetName() + " is light mod form? " + FormHelper.IsLightModForm(aForm))
 
     elseIf selected == hexToModIndex
+        Debug.MessageBox(text + " mod index is " + FormHelper.HexToModIndex(text))
 
     elseIf selected == hexToModIndexHex
+        Debug.MessageBox(text + " mod index hex is " + FormHelper.HexToModIndexHex(text))
 
     elseIf selected == formToModIndex
+        Form aForm = FormHelper.HexToForm(text)
+        Debug.MessageBox(aForm + " " + aForm.GetName() + " mod index hex is " + FormHelper.FormToModIndex(aForm))
 
     elseIf selected == formToModIndexHex
+        Form aForm = FormHelper.HexToForm(text)
+        Debug.MessageBox(aForm + " " + aForm.GetName() + " mod index hex is " + FormHelper.FormToModIndexHex(aForm))
 
     endIf
 endFunction
