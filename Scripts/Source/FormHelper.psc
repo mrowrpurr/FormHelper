@@ -1,7 +1,7 @@
 scriptName FormHelper hidden
 
 ; Returns the provided hexadecimal string as a decimal integer value.
-int function HexToDecimal(string hex) global
+int function HexToInt(string hex) global
     int decimal = 0
 
     int base = 1
@@ -11,10 +11,6 @@ int function HexToDecimal(string hex) global
     while index >= 0
         string character = StringUtil.Substring(hex, index, 1)
         int characterValue = StringUtil.AsOrd(character)
-        if characterValue == -1
-            Debug.Trace("[FormHelper] HexToDecimal() Invalid hex string provided: " + hex)
-            return -1
-        endIf
         if (characterValue >= 48 && characterValue <= 57) ; 0 - 9
             decimal += (characterValue - 48) * base
             base *= 16
@@ -29,23 +25,7 @@ int function HexToDecimal(string hex) global
 endFunction
 
 ; Returns the provided decimal integer value as a hexadecimal string.
-;
-; Intended to be called with Skyrim Form ID values.
-;
-; By default, the string will be at least 8 characters long by adding
-; front-leading padding of zero `"0"` values (_to match Skyrim standard hex values_).
-;
-; To use this for generic Decimal to Hex conversion, specify `isFormID = false`
-string function DecimalToHex(int decimal, int minHexStringLength = 8, bool isFormID = true) global
-    int originalDecimal = decimal
-
-    bool isLight = false
-
-    if isFormID && decimal < 0
-        isLight = true
-        decimal = Math.LogicalAnd(decimal, 0xFFF) ; ESL Form ID
-    endIf
-
+string function IntToHex(int decimal) global
     string hex = ""
 
     int[] hexValues = new int[128]
@@ -55,22 +35,13 @@ string function DecimalToHex(int decimal, int minHexStringLength = 8, bool isFor
 
     while quotient != 0
         temp = quotient % 16
-
         if temp < 10
             temp += 48
         else
             temp += 55
         endIf
-
         hexValues[i] = temp
         i += 1
-
-        if i > 128
-            ; I don't actually think this is actually possible?
-            Debug.Trace("[FormHelper] DecimalToHex() Provided decimal too large to convert: " + decimal)
-            return ""
-        endIf
-
         quotient = quotient / 16
     endWhile
 
@@ -80,13 +51,41 @@ string function DecimalToHex(int decimal, int minHexStringLength = 8, bool isFor
         i -= 1
     endWhile
 
+    return hex
+endFunction
+
+; Returns the provided Form ID decimal integer value as a Skyrim Form hexadecimal string.
+;
+; Intended to be called only with Skyrim Form ID values.
+; Use `IntToHex()` for regular decimal to hexadecimal conversion.
+;
+; The resulting hexadecimal string will be 8 characters long.
+;
+; Full Plugins:  xx000000 where xx is the mod index
+; Light Plugins: FExxx000 where xxx is the light mod index
+string function FormIdToHex(int decimal) global
+    int minHexStringLength = 8
+    bool isLight = false
+    int lightModIndex
+
+    if decimal < 0
+        ; Light mods have negative Form IDs
+        isLight = true
+        ; Get the main Form ID from this light mod's negative Form ID (without mod index)
+        decimal = Math.LogicalAnd(decimal, 0xFFF) 
+        ; Get just the mod index from this light mod's negative Form ID
+        lightModIndex = Math.RightShift(Math.LogicalAnd(decimal, 16773120), 12) ; (x00FF000 & formID) >> 12
+    endIf
+
+    string hex = IntToHex(decimal)
+
     if isLight && minHexStringLength == 8
         minHexStringLength = 3 ; First 5 characters will be added below: FE xyz
     endIf
 
     int zeroPaddingPrefixCount = minHexStringLength - StringUtil.GetLength(hex)
     if zeroPaddingPrefixCount > 0
-        i = 0
+        int i = 0
         while i < zeroPaddingPrefixCount
             hex = "0" + hex
             i += 1
@@ -94,12 +93,11 @@ string function DecimalToHex(int decimal, int minHexStringLength = 8, bool isFor
     endIf
 
     if isLight
-        int modIndex = Math.RightShift(Math.LogicalAnd(originalDecimal, 16773120), 12) ; (x00FF000 & formID) >> 12
-        string modIndexText = DecimalToHex(modIndex, isFormID = false, minHexStringLength = 1)
+        string modIndexText = IntToHex(lightModIndex)
         hex = modIndexText + hex
         int modIndexTextLength = StringUtil.GetLength(modIndexText)
         int zerosToAdd = 3 - modIndexTextLength
-        i = 0
+        int i = 0
         while i < zerosToAdd
             hex = "0" + hex
             i += 1
@@ -110,24 +108,9 @@ string function DecimalToHex(int decimal, int minHexStringLength = 8, bool isFor
     return hex
 endFunction
 
-; Alias for `HexToDecimal()`
-int function HexToInt(string hex) global
-    return HexToDecimal(hex)
-endFunction
-
-; doc
-int function FormToInt(Form aForm) global
-    return aForm.GetFormID()
-endFunction
-
-; Alias for `DecimalToHex()`
-string function IntToHex(int decimal, int minHexStringLength = 8, bool isFormID = true) global
-    return DecimalToHex(decimal, minHexStringLength, isFormID)
-endFunction
-
-; ...
+; Get the hexadecimal Skyrim string for this Form.
 string function FormToHex(Form aForm) global
-    return DecimalToHex(aForm.GetFormID())
+    return FormIdToHex(aForm.GetFormID())
 endFunction
 
 ; Provide a hex Form ID, e.g. `F` or `0000000F` or `17000d62` or `FE003801`
@@ -144,7 +127,7 @@ Form function HexToForm(string hex) global
             return Game.GetFormFromFile(formId, HexToModName(hex))
         endIf
     else
-        return Game.GetForm(HexToDecimal(hex))
+        return Game.GetForm(HexToInt(hex))
     endIf
 endFunction
 
@@ -155,56 +138,39 @@ string function HexToModName(string hex) global
     int len = StringUtil.GetLength(hex)
     if len == 8
         if StringUtil.Find(hex, "FE") == 0
-            return Game.GetLightModName(HexToDecimal(StringUtil.Substring(hex, 2, 3)))
+            return Game.GetLightModName(HexToInt(StringUtil.Substring(hex, 2, 3)))
         else
-            return Game.GetModName(HexToDecimal(StringUtil.Substring(hex, 0, 2)))
+            return Game.GetModName(HexToInt(StringUtil.Substring(hex, 0, 2)))
         endIf
     else
         return "skyrim.esm"
     endIf
 endFunction
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-; ; doc
-; bool function IsModLightHex() global
-; endFunction
-
-; ; doc
-; bool function IsModLightForm() global
-; endFunction
-
 ; doc
-int function GetModIndexFromHex() global
+string function FormToModName(Form aForm) global
+
 endFunction
 
 ; doc
-int function GetModIndexFromInt() global
+bool function IsLightMod(string modPlugin) global
 endFunction
 
 ; doc
-int function GetModIndexFromForm() global
+bool function IsLightModHex(string hex) global
 endFunction
 
 ; doc
-string function GetModHexPrefixFromHex(string hex) global
-    int len = StringUtil.GetLength(hex)
-    if len == 8
-        if StringUtil.Find(hex, "FE") == 0
-            return StringUtil.Substring(2, 3)
-        else
-            return StringUtil.Substring(0, 2)
-        endIf
-    else
-        return "00"
-    endIf
+bool function IsLightModForm(Form aForm) global
 endFunction
 
-; doc
-string function GetModHexPrefixFromInt(int decimal) global
-    ; DecimalToHex()
-endFunction
+; Returns the Mod Index for the provided Form as a hexadecimal string.
+;
+; For full plugins, this will be 2 characters long.
+; For light plugins, this will be 3 characters long.
+;
+; To use this with `Game.GetModName()` or `Game.GetLightModName()`
+; convert the return value to a decimal via `HexToInt()`
+string function GetModIndexTextFromForm(Form aForm) global
 
-; doc
-string function GetModHexPrefixFromForm(Form aForm) global
 endFunction
