@@ -25,15 +25,10 @@
     <Folders>
         <Folder>./Scripts/Source</Folder>
     </Folders>
-    <Packages Output=".">
-        <Package Name="@ModName" RootDir=".">
-            <Match In="Scripts">FormHelper.pex</Match>
-            <Match In="Scripts\Source">FormHelper.psc</Match>
-            <!-- <Match In="interface\translations">*.txt</Match> -->
-        </Package>
-    </Packages>
     <ZipFiles Output="Build">
         <ZipFile Name="@ModName" RootDir="." Compression="deflate">
+            <Match In="Scripts">FormHelper.pex</Match>
+            <Match In="Scripts\Source">FormHelper.psc</Match>
             <Include>@ModName.esp</Include>
             <Include NoRecurse="true">*.bsa</Include>
         </ZipFile>
