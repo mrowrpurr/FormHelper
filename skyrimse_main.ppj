@@ -10,7 +10,7 @@
     Package="false"
     Final="false">
     <Variables>
-        <Variable Name="ModName" Value="FormHelper_UI" />
+        <Variable Name="ModName" Value="FormHelper" />
         <Variable Name="ModsFolder" Value="C:\Users\mrowr\Dropbox\Skyrim\Mods" />
         <Variable Name="ImportsFolder" Value="C:\Users\mrowr\Dropbox\Skyrim\Imports" />
     </Variables>
@@ -24,11 +24,9 @@
     </Folders>
     <ZipFiles Output="Build">
         <ZipFile Name="@ModName" RootDir="." Compression="deflate">
-            <Match>FormHelper_UI.esp</Match>
-            <Match In="Scripts">FormHelper_UI.pex</Match>
-            <Match In="Scripts">FormHelper_UI_Effect.pex</Match>
-            <Match In="Scripts\Source">FormHelper_UI.psc</Match>
-            <Match In="Scripts\Source">FormHelper_UI_Effect.psc</Match>
+            <Match In="Scripts">FormHelper.pex</Match>
+            <Match In="Scripts\Source">FormHelper.psc</Match>
+            <Match In="Source\Scripts">FormHelper.psc</Match>
         </ZipFile>
     </ZipFiles>
 </PapyrusProject>
