@@ -7,7 +7,7 @@
     Optimize="false" 
     Release="false" 
     Zip="true"
-    Package="true"
+    Package="false"
     Final="false">
     <Variables>
         <!-- Set the name of your mod: -->

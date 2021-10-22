@@ -63,7 +63,9 @@ endFunction
 ;
 ; Full Plugins:  xx000000 where xx is the mod index
 ; Light Plugins: FExxx000 where xxx is the light mod index
+; Dynamic forms: FF000xxx
 string function FormIdToHex(int decimal) global
+    string rawHex = IntToHex(decimal * -1)
     int minHexStringLength = 8
     bool isLight = false
     int lightModIndex
@@ -102,7 +104,11 @@ string function FormIdToHex(int decimal) global
             hex = "0" + hex
             i += 1
         endWhile
-        hex = "FE" + hex
+        if StringUtil.Substring(rawHex, 0, 2) == "FF" ; Dynamically allocated
+            hex = "FF" + hex
+        else
+            hex = "FE" + hex
+        endIf
     endIf
 
     return hex
@@ -122,6 +128,11 @@ Form function HexToForm(string hex) global
         if StringUtil.Find(hex, "FE") == 0
             int formId = HexToInt(StringUtil.Substring(hex, 5, 3))
             return Game.GetFormFromFile(formId, HexToModName(hex))
+        elseIf StringUtil.Find(hex, "FF") == 0
+            ; As far as I can tell, there is no way to get dynamically allocated forms
+            ; via their ID using GetForm() or GetFormFromFile() etc.
+            ; If anyone knows, let me know! I tried GetForm() and GetFormFromFile(id, "") etc.
+            return None
         else
             int formId = HexToInt(StringUtil.Substring(hex, 2, 6))
             return Game.GetFormFromFile(formId, HexToModName(hex))
@@ -139,6 +150,8 @@ string function HexToModName(string hex) global
     if len == 8
         if StringUtil.Find(hex, "FE") == 0
             return Game.GetLightModName(HexToInt(StringUtil.Substring(hex, 2, 3)))
+        elseIf StringUtil.Find(hex, "FF") == 0
+            return "" ; Dynamically allocated forms have no associated mod name
         else
             return Game.GetModName(HexToInt(StringUtil.Substring(hex, 0, 2)))
         endIf
@@ -174,6 +187,8 @@ int function HexToModIndex(string hex) global
     if len == 8
         if StringUtil.Find(hex, "FE") == 0
             return HexToInt(StringUtil.Substring(hex, 2, 3))
+        elseIf StringUtil.Find(hex, "FF") == 0
+            return 0 ; Dynamically allocated forms have no associated mod
         else
             return HexToInt(StringUtil.Substring(hex, 0, 2))
         endIf
@@ -189,6 +204,8 @@ string function HexToModIndexHex(string hex) global
     if len == 8
         if StringUtil.Find(hex, "FE") == 0
             return StringUtil.Substring(hex, 2, 3)
+        elseIf StringUtil.Find(hex, "FF") == 0
+            return "000"
         else
             return StringUtil.Substring(hex, 0, 2)
         endIf
@@ -212,10 +229,5 @@ endFunction
 ; To use this with `Game.GetModName()` or `Game.GetLightModName()`
 ; convert the return value to a decimal via `HexToInt()`
 string function FormToModIndexHex(Form aForm) global
-    string hex = FormToHex(aForm)
-    if StringUtil.Find(hex, "FE") == 0
-        return StringUtil.Substring(hex, 2, 3)
-    else
-        return StringUtil.Substring(hex, 0, 2)
-    endIf
+    return HexToModIndexHex(FormToHex(aForm))
 endFunction
